@@ -1,0 +1,9 @@
+@CustomFields = (
+    { Name => 'Invoiced', Type => 'SelectSingle', 
+	LookupType => 'RT::Queue-RT::Ticket-RT::Transaction',
+    	Values => [
+		   { Name => 'No', SortOrder => 10 },
+		   { Name => 'Yes', SortOrder => 20 },
+		   ], 
+    },
+);

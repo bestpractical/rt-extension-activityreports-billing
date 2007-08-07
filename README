@@ -1,0 +1,33 @@
+This extension is Copyright (C) 2007 Best Practical Solutions, LLC.
+
+It is freely redistributable under the terms of version 2 of the GNU GPL.
+
+SUMMARY ---
+
+RT::Extension::ActivityReports::Billing is a plugin to the module 
+RT::Extension::ActivityReports that provides functionality for reporting on
+billable time, and an interface to record whether a billable transaction has
+been invoiced.
+
+PREREQUISITES ---
+
+This extension requires version 0.10 of RT::Extension::ActivityReports.
+
+INSTALLATION ---
+
+To install the extension:
+
+$ perl Makefile.PL
+
+(it may prompt you for the path to your RT.pm, if it can't
+automatically detect it.)
+
+$ make
+$ make install
+$ make initdb
+
+USAGE ---
+
+Once installed, the billing activity report can be accessed in the pick-list shown
+at http://<path_to_your_RT>/Reports/Activity/index.html
+

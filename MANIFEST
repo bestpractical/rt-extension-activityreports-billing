@@ -1,0 +1,17 @@
+html/Callbacks/ActivityReportsBilling/Reports/Activity/Elements/LimitReport/AddOptions
+html/Callbacks/ActivityReportsBilling/Reports/Activity/Elements/LimitReport/AddReports
+html/Callbacks/ActivityReportsBilling/Reports/Activity/index.html/FlipInvoiced
+html/Reports/Activity/Elements/BillableActivityDetail
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx/Factory.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install.pm
+lib/RT/Extension/ActivityReports/Billing.pm
+Makefile.PL
+MANIFEST

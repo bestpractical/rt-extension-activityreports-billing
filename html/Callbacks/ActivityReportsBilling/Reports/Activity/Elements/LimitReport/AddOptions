@@ -1,0 +1,5 @@
+<br />
+Include invoiced activity on billing report: <input type="checkbox" name="IncludeInvoiced" <% $IncludeInvoiced ? 'checked' : '' %>>
+<%args>
+$IncludeInvoiced => undef
+</%args>

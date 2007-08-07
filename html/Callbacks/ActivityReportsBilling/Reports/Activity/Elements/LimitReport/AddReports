@@ -1,0 +1,4 @@
+<option value="BillableActivityDetail" <% $ReportType =~ /BillableActivityDetail/ ? 'selected' : '' %>>Billable activity detail</option>
+<%args>
+$ReportType => ''
+</%args>

@@ -1,0 +1,95 @@
+<form action="index.html" method=GET>
+<!-- This form is used to update the "invoiced" property of the listed transactions. 
+     At the same time, it will resubmit the current report request. -->
+<input type="hidden" name="Query" value="<% $query %>">
+<input type="hidden" name="Start" value="<% $start %>">
+<input type="hidden" name="End" value="<% $end %>">
+<input type="hidden" name="Actor" value="<% $actor %>">
+<input type="hidden" name="ReportType" value="BillableActivityDetail">
+<input type="hidden" name="IncludeInvoiced" value="<% $IncludeInvoiced %>">
+<table style="width: 100%">
+<tr class="titlerow">
+<th>Queue</th><th>Date</th><th>Time</th><th>Ticket #</th><th>User</th><th>Time Worked</th><th>Invoiced</th><th>Description</th>
+</tr>
+% for my $item (@items) {
+<tr>
+<td><% $item->{queue} %></td>
+<td><% $item->{date} %></td>
+<td><% $item->{time} %></td>
+<td><% $item->{id} %></td>
+<td><% $item->{actor} %></td>
+<td><% $item->{timeworked} %></td>
+<td><% loc( $item->{invoiced} ) %> &nbsp;&nbsp;&nbsp; <input type="checkbox" name="flipInvoiced_<% $item->{txnid} %>">(Change this)</td>
+<td><% $item->{notes} %></td>
+</tr>
+% }
+<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><& /Elements/Submit, Label => loc( 'Update invoicing data' ) &></td><td></td></tr>
+</table>
+</form>
+
+<%args>
+$query => ''
+$start => "2005/01/01"
+$end   => "2006/01/01"
+$actor => ''
+</%args>
+
+<%init>
+use RT::Extension::ActivityReports qw( RelevantTxns );
+
+# Get the IncludeInvoiced argument (see 
+# html/Callbacks/Reports/Activity/Elements/LimitReport/AddOptions) 
+# from the original request, as it will not have been passed directly.
+my $original_args = $m->request_args();
+my $IncludeInvoiced = undef;
+if( exists( $original_args->{'IncludeInvoiced'} ) ) {
+    $IncludeInvoiced = $original_args->{'IncludeInvoiced'};
+}
+
+my $tickets = RT::Tickets->new($session{'CurrentUser'});
+$tickets->FromSQL(join " AND ", map {"($_)"} grep {/\S/} ($query, "Updated >= '$start' AND Updated <= '$end'"));
+my @items;
+while (my $ticket = $tickets->Next) {
+    my $txns = RelevantTxns( $ticket, start => $start, end => $end, query => $query, timed => 1 );
+    while (my $txn = $txns->Next) {
+	# Do the "invoiced" CF lookup, and skip invoiced transactions if we
+	# are limiting to unbilled ones.
+	my $invoiced = isinvoiced( $txn );
+	next if( !$IncludeInvoiced && $invoiced eq 'Yes' );
+	    
+	# We have to filter for actor here, not in the query.  Alas.
+	if( $actor ) {
+	    next unless $txn->CreatorObj->Name eq $actor;
+	}
+	push @items, { queue => $txn->TicketObj->QueueObj->Name,
+		       id => $txn->TicketObj->id,
+		       txnid => $txn->id,
+		       date => (split ' ', $txn->CreatedObj->ISO)[0],
+		       time => (split ' ', $txn->CreatedObj->ISO)[1],
+		       timeworked => $txn->TimeTaken,
+		       invoiced => $invoiced,
+		       actor => $txn->CreatorObj->Name,
+		       notes => ($txn->Content ne 'This transaction appears to have no content' ? substr($txn->Content, 0, 60) :  $txn->BriefDescription)
+		       };
+    }
+}
+
+@items = sort {
+           $a->{queue}    cmp $b->{'queue'}
+        || $a->{'status'} cmp $b->{'status'}
+        || $a->{'id'}     <=> $b->{'id'}
+        || $a->{'actor'}  cmp $b->{'actor'}
+        || $a->{'notes'}  cmp $b->{'notes'}
+} @items;
+
+sub isinvoiced {
+    # This field, if it exists, will have a 'Yes' or 'No' value, or will
+    # be unset.  Unset means "no".  Return the string for display.
+    my( $txn ) = @_;
+    my $isinvoiced = $txn->CustomFieldValues( 'Invoiced' ) ?	
+	$txn->FirstCustomFieldValue( 'Invoiced' ) : 'No';
+    $isinvoiced = 'No' unless $isinvoiced;
+    return $isinvoiced;
+}
+
+</%init>

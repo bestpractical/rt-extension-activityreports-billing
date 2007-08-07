@@ -1,0 +1,35 @@
+<%init>
+use RT::Transaction;
+# Update the billing "invoiced" property for each relevant transaction, if we 
+# have been asked to.
+foreach my $key( keys %ARGS ) {
+    if( $key =~ /^flipInvoiced_(\d+)$/ ) {
+        my $txn_id = $1;
+        flipinvoiced( $txn_id, $ARGS{$key} );
+        delete $ARGS{$key};
+    }
+}
+
+
+sub flipinvoiced {
+    # Given a transaction ID, change the state of its "Invoiced" custom field.
+    # That is, values change as follows: "Yes" -> "No"; "No" -> "Yes"; unset -> "Yes".
+    
+    my( $txnid ) = @_;
+    my $txn = RT::Transaction->new( $session{'CurrentUser'} );
+    $txn->Load( $txnid );
+    unless( $txn->Id ) {
+	$RT::Logger->warning( "No transaction loaded for id $txnid" );
+	return;
+    }
+    
+    if( $txn->CustomFieldValues( 'Invoiced' ) ) {
+	my $current = $txn->FirstCustomFieldValue( 'Invoiced' ) || '';
+	my $newval = $current eq 'Yes' ? 'No' : 'Yes';
+        my( $ret, $msg ) = $txn->AddCustomFieldValue( Field => 'Invoiced', Value => $newval );
+	$RT::Logger->warning( $msg ) unless $ret;
+    } else {
+        $RT::Logger->warning( "Transaction custom field 'Invoiced' does not exist for transaction $txnid" );
+    }
+}
+</%init>
