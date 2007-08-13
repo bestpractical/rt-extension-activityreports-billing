@@ -26,6 +26,8 @@ $ make
 $ make install
 $ make initdb
 
+When these steps have completed successfully, restart your RT webserver.
+
 USAGE ---
 
 Once installed, the billing activity report can be accessed in the pick-list shown
