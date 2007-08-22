@@ -9,24 +9,25 @@
 <input type="hidden" name="IncludeInvoiced" value="<% $IncludeInvoiced %>">
 <table style="width: 100%">
 <tr class="titlerow">
-<th>Queue</th><th>Date</th><th>Time</th><th>Ticket #</th><th>User</th><th>Time Worked</th><th>Invoiced</th><th>Description</th>
+<th>Queue</th><th>Date</th><th>Time</th><th>Time Worked</th><th>Invoiced</th><th>User</th><th>Ticket #</th><th>Description</th>
 </tr>
 % for my $item (@items) {
 <tr>
 <td><% $item->{queue} %></td>
 <td><% $item->{date} %></td>
 <td><% $item->{time} %></td>
-<td><% $item->{id} %></td>
-<td><% $item->{actor} %></td>
 <td><% $item->{timeworked} %></td>
 <td><% loc( $item->{invoiced} ) %> &nbsp;&nbsp;&nbsp; <input type="checkbox" name="flipInvoiced_<% $item->{txnid} %>">(Change this)</td>
+<td><% $item->{actor} %></td>
+<td><a href="/Ticket/Display.html?id=<% $item->{id} %>"><% $item->{id} %></a></td>
 <td><% $item->{notes} %></td>
 </tr>
 % }
-<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><& /Elements/Submit, Label => loc( 'Update invoicing data' ) &></td><td></td></tr>
+<tr><td></td><td></td><td></td><td></td><td><& /Elements/Submit, Label => loc( 'Update invoicing data' ) &></td><td></td><td></td><td></td></tr>
 </table>
 </form>
-
+<br>
+<br>
 <%args>
 $query => ''
 $start => "2005/01/01"
@@ -69,7 +70,7 @@ while (my $ticket = $tickets->Next) {
 		       timeworked => $txn->TimeTaken,
 		       invoiced => $invoiced,
 		       actor => $txn->CreatorObj->Name,
-		       notes => ($txn->Content ne 'This transaction appears to have no content' ? substr($txn->Content, 0, 60) :  $txn->BriefDescription)
+		       notes => ($txn->Content ne 'This transaction appears to have no content' ? $txn->Content :  $txn->Description)
 		       };
     }
 }
