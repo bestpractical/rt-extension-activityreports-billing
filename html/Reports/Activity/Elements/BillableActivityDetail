@@ -19,7 +19,7 @@
 <td><% $item->{timeworked} %></td>
 <td><% loc( $item->{invoiced} ) %> &nbsp;&nbsp;&nbsp; <input type="checkbox" name="flipInvoiced_<% $item->{txnid} %>">(Change this)</td>
 <td><% $item->{actor} %></td>
-<td><a href="/Ticket/Display.html?id=<% $item->{id} %>"><% $item->{id} %></a></td>
+<td><a href="$RT::WebPath/Ticket/Display.html?id=<% $item->{id} %>"><% $item->{id} %></a></td>
 <td><% $item->{notes} %></td>
 </tr>
 % }
