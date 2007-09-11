@@ -24,6 +24,8 @@ automatically detect it.)
 
 $ make
 $ make install
+
+If this is the first time you are installing this extension:
 $ make initdb
 
 When these steps have completed successfully, restart your RT webserver.
